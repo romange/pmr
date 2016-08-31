@@ -45,3 +45,11 @@ if(DOXYGEN_FOUND)
 else()
     ADD_CUSTOM_TARGET(docs COMMENT "Doxygen not found. Please install doxygen to use this target." VERBATIM)
 endif()
+
+
+install(
+  TARGETS pmr
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib)
+
+install(DIRECTORY include DESTINATION .)
