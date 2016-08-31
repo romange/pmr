@@ -9,6 +9,21 @@ namespace pmr
         std::size_t default_nextbuf_size = 32 * sizeof(void*);
     }
 
+	// std::align is not implemented in gcc 4. Copied it from somewhere. Lets hope it works.
+    namespace todo {
+        inline void* align(size_t __align, size_t __size, void*& __ptr, size_t& __space) noexcept {
+              const auto __intptr = reinterpret_cast<uintptr_t>(__ptr);
+              const auto __aligned = (__intptr - 1u + __align) & -__align;
+              const auto __diff = __aligned - __intptr;
+              if ((__size + __diff) > __space)
+                return nullptr;
+              else
+                {
+                  __space -= __diff;
+                  return __ptr = reinterpret_cast<void*>(__aligned);
+                }
+            }
+    }
 
     monotonic_buffer_resource::monotonic_buffer_resource() noexcept
         : monotonic_buffer_resource(default_nextbuf_size, nullptr)
@@ -33,7 +48,7 @@ namespace pmr
 
     monotonic_buffer_resource::monotonic_buffer_resource(
             std::size_t initial_size, memory_resource* upstream) noexcept
-        : m_upstream{upstream ? *upstream : *get_default_resource()}
+        : m_upstream(upstream ? *upstream : *get_default_resource())
         , m_currentbuf{nullptr}
         , m_currentbuf_size{0}
         , m_nextbuf_size{std::max(initial_size, default_nextbuf_size)}
@@ -50,7 +65,7 @@ namespace pmr
 
     monotonic_buffer_resource::monotonic_buffer_resource(
             void* buf, std::size_t bufsize, memory_resource* upstream) noexcept
-        : m_upstream{upstream ? *upstream : *get_default_resource()}
+        : m_upstream(upstream ? *upstream : *get_default_resource())
         , m_currentbuf{buf}
         , m_currentbuf_size{bufsize}
         , m_nextbuf_size{std::max(bufsize, default_nextbuf_size)}
@@ -82,14 +97,14 @@ namespace pmr
     void*
     monotonic_buffer_resource::do_allocate(std::size_t bytes, std::size_t align)
     {
-        void* allocated = std::align(align, bytes, m_currentbuf, m_currentbuf_size);
+        void* allocated = todo::align(align, bytes, m_currentbuf, m_currentbuf_size);
         if(!allocated)
         {
             m_nextbuf_size = std::max(m_nextbuf_size, bytes + align);
             m_currentbuf = m_blocks.extend(m_nextbuf_size, m_upstream);
             m_currentbuf_size = m_nextbuf_size;
             recalculate_next_buffer_size();
-            allocated = std::align(align, bytes, m_currentbuf, m_currentbuf_size);
+            allocated = todo::align(align, bytes, m_currentbuf, m_currentbuf_size);
         }
         if(!allocated)
         {
