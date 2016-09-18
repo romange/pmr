@@ -135,6 +135,10 @@ namespace pmr
         //! \return the memory_resource backing this allocator
         memory_resource* resource() const;
 
+        // Make it compliant with pre-cpp17 compilers.
+        size_t max_size() const {
+            return size_t(-1) / sizeof(value_type);
+        }
       private:
         struct unaware{}; // ctor doesn't take allocator args
         struct aware_tagged{}; // first 2 args of ctor are (std::allocator_arg_t, alloc,...)
