@@ -4,11 +4,9 @@
 #include <cstddef>
 
 #if defined(__GNUC__) && (__GNUC__ < 5)
-#ifdef _GCC_MAX_ALIGN_T
     namespace std {
         using ::max_align_t;
     }
-#endif
 #endif
 
 namespace pmr
