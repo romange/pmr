@@ -165,7 +165,7 @@ TEST_CASE_METHOD(use_tracking_default, "list of allocator-aware", tags)
     //  #2 construct listnode
     //  #3 copy string into listnode
     std::size_t allocations = tmr.allocations.size();
-    CHECK(allocations == 3);
+    CHECK(allocations <= 3);
 
     list_t copy = l;
 

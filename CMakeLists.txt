@@ -19,6 +19,7 @@ set_target_properties(pmr PROPERTIES
     CXX_STANDARD 11
     VERSION ${PMR_VERSION}
     SOVERSION ${PMR_VERSION_MAJOR})
+
 target_compile_options(pmr
     PRIVATE -Wall
     PRIVATE -Wpedantic
@@ -30,7 +31,7 @@ target_compile_options(pmr
 #SET(CMAKE_EXE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address)
 
 include(CTest)
-# add_subdirectory(test)
+add_subdirectory(test)
 
 
 include(FindDoxygen)

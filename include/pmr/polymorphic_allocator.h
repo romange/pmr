@@ -14,6 +14,10 @@ namespace pmr
       public:
         using value_type = T;
 
+        // Deprecated in c++17.
+        typedef std::size_t size_type;
+        typedef std::ptrdiff_t difference_type;
+
 #       ifndef DOCS
         // these shouldn't be necessary but the stdlib I'm using to test right
         // now doesn't use std::allocator_traits in std::list
